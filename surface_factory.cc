@@ -1,12 +1,14 @@
 #include "base/files/file_path.h"
 #include "base/native_library.h"
 #include "ui/ozone/platform/raspberry/surface_factory.h"
+#include "ui/ozone/platform/raspberry/vsync_provider.h"
 #include "ui/ozone/public/surface_ozone_egl.h"
 #include "ui/ozone/public/surface_factory_ozone.h"
 #include "ui/gfx/vsync_provider.h"
 
 #include <EGL/egl.h>
-#include <EGL/fbdev_window.h>
+#include <EGL/eglplatform.h>
+#include <bcm_host.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
@@ -23,7 +25,9 @@ namespace ui {
           VC_RECT_T dst_rect;
           VC_RECT_T src_rect;;
 
-          graphics_get_display_size(0, &native_window_.width, &native_window_.height);
+          graphics_get_display_size(0,
+                                    (uint32_t*)&(native_window_.width),
+                                    (uint32_t*)&(native_window_.height));
 
           dst_rect.x = 0;
           dst_rect.y = 0;
@@ -48,7 +52,7 @@ namespace ui {
             DISPMANX_PROTECTION_NONE,
             0,
             0,
-            0);
+            DISPMANX_NO_ROTATE);
 
           vc_dispmanx_update_submit_sync(dispman_update);
         }
@@ -73,6 +77,10 @@ namespace ui {
         virtual bool ResizeNativeWindow(const gfx::Size& viewport_size) {
           /* TODO */
           return true;
+        }
+
+        virtual scoped_ptr<gfx::VSyncProvider> CreateVSyncProvider() {
+          return scoped_ptr<gfx::VSyncProvider>(new RaspberryVSyncProvider());
         }
 
         virtual void OnSwapBuffersAsync(const SwapCompletionCallback& callback) {

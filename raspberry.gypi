@@ -28,7 +28,9 @@
         'ozone_platform.cc',
         'ozone_platform.h',
         'surface_factory.cc',
-        'surface_factory.h'
+        'surface_factory.h',
+        'vsync_provider.cc',
+        'vsync_provider.h'
       ],
       'link_settings': {
         'libraries': [
