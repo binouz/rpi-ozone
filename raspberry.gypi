@@ -5,7 +5,7 @@
 {
   'variables': {
     'internal_ozone_platform_deps': [
-      'ozone_platform_raspberry,
+      'ozone_platform_raspberry',
     ],
     'internal_ozone_platforms': [
       'raspberry'
@@ -32,7 +32,7 @@
       ],
       'link_settings': {
         'libraries': [
-          '-l'
+          '-lGLESv2 -lEGL -lbcm_host -lvcos -lvchiq_arm'
         ],
       },
     },
