@@ -12,6 +12,8 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
+#include <iostream>
+
 namespace ui {
 
   namespace {
@@ -25,9 +27,19 @@ namespace ui {
           VC_RECT_T dst_rect;
           VC_RECT_T src_rect;;
 
-          graphics_get_display_size(0,
-                                    (uint32_t*)&(native_window_.width),
-                                    (uint32_t*)&(native_window_.height));
+          bcm_host_init();
+
+          if (graphics_get_display_size(
+                DISPMANX_ID_HDMI,
+                (uint32_t *)&(native_window_.width),
+                (uint32_t *)&(native_window_.height)) < 0)
+          {
+            LOG(ERROR) << "graphics_get_display_size failed";
+            native_window_.width = 1280;
+            native_window_.height = 720;
+          }
+
+          LOG(INFO) << "width=" << native_window_.width << " height=" << native_window_.height;
 
           dst_rect.x = 0;
           dst_rect.y = 0;
@@ -36,22 +48,22 @@ namespace ui {
 
           src_rect.x = 0;
           src_rect.y = 0;
-          src_rect.width = native_window_.width /*<< 16*/;
-          src_rect.height = native_window_.height /*<< 16*/;
+          src_rect.width = native_window_.width << 16;
+          src_rect.height = native_window_.height << 16;
 
-          dispman_display_ = vc_dispmanx_display_open(0);
+          dispman_display_ = vc_dispmanx_display_open(DISPMANX_ID_HDMI);
           dispman_update = vc_dispmanx_update_start(0);
 
           native_window_.element = vc_dispmanx_element_add(
             dispman_update,
             dispman_display_,
-            0,
+            1,
             &dst_rect,
             0,
             &src_rect,
             DISPMANX_PROTECTION_NONE,
-            0,
-            0,
+            NULL,
+            NULL,
             DISPMANX_NO_ROTATE);
 
           vc_dispmanx_update_submit_sync(dispman_update);
