@@ -34,7 +34,7 @@
       ],
       'link_settings': {
         'libraries': [
-          '-lGLESv2 -lEGL -lbcm_host -lvcos -lvchiq_arm'
+          '-lGLESv2 -lEGL -lbcm_host -lvcos -lvchiq_arm -lvchostif'
         ],
       },
     },
